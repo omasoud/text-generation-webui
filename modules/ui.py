@@ -21,7 +21,7 @@ delete_symbol = '🗑️'
 save_symbol = '💾'
 
 theme = gr.themes.Default(
-    font=['Helvetica', 'ui-sans-serif', 'system-ui', 'sans-serif'],
+    font=['Consolas', 'ui-sans-serif', 'system-ui', 'sans-serif'],
     font_mono=['IBM Plex Mono', 'ui-monospace', 'Consolas', 'monospace'],
 ).set(
     border_color_primary='#c5c5d2',

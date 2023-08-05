@@ -23,7 +23,11 @@ def infer_loader(model_name):
     if not path_to_model.exists():
         loader = None
     elif Path(f'{shared.args.model_dir}/{model_name}/quantize_config.json').exists() or ('wbits' in model_settings and type(model_settings['wbits']) is int and model_settings['wbits'] > 0):
-        loader = 'AutoGPTQ'
+        # We will prefer ExLlama_HF for GPTQ models, without having to pass --loader exllama so that we can also load non-GPTQ models with the other loaders. 
+        # And we don't want to save exllama as the default loader in the config file of each GPTQ model.
+#        loader = 'ExLlama_HF' 
+        loader = 'ExLlama' 
+        #loader = 'AutoGPTQ'
     elif len(list(path_to_model.glob('*ggml*.bin'))) > 0:
         loader = 'llama.cpp'
     elif re.match('.*ggml.*\.bin', model_name.lower()):

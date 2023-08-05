@@ -22,7 +22,8 @@ def run(user_input, history):
         'your_name': 'You',
 
         'regenerate': False,
-        '_continue': False,
+#        '_continue': False,
+        '_continue': True,
         'stop_at_newline': False,
         'chat_generation_attempts': 1,
         'chat-instruct_command': 'Continue the chat dialogue below. Write a single reply for the character "<|character|>".\n\n<|prompt|>',
@@ -69,13 +70,19 @@ def run(user_input, history):
 
 
 if __name__ == '__main__':
-    user_input = "Please give me a step-by-step guide on how to plant a tree in my backyard."
+    # user_input = "Please give me a step-by-step guide on how to plant a tree in my backyard."
 
-    # Basic example
-    history = {'internal': [], 'visible': []}
+    # # Basic example
+    # history = {'internal': [], 'visible': []}
 
-    # "Continue" example. Make sure to set '_continue' to True above
-    # arr = [user_input, 'Surely, here is']
-    # history = {'internal': [arr], 'visible': [arr]}
+    # # "Continue" example. Make sure to set '_continue' to True above
+    # # arr = [user_input, 'Surely, here is']
+    # # history = {'internal': [arr], 'visible': [arr]}
+
+    # run(user_input, history)
+
+    arr = ['Is the sky blue?', 'Yes, the sky is blue.']
+    history = {'internal': [arr], 'visible': [arr]}
+    user_input = 'Why?'
 
     run(user_input, history)

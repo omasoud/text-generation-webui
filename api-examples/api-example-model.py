@@ -2,7 +2,7 @@
 
 import requests
 
-HOST = '0.0.0.0:5000'
+HOST = 'localhost:5000'
 
 
 def generate(prompt, tokens=200):

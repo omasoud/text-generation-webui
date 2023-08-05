@@ -9,11 +9,11 @@ from modules.logging_colors import logger
 
 if torch.cuda.is_available() and not torch.version.hip:
     try:
-        from llama_cpp_cuda import Llama, LlamaCache, LogitsProcessorList
+        from llama_cpp_cuda import Llama, LlamaCache, LogitsProcessorList, llama_print_timings
     except:
-        from llama_cpp import Llama, LlamaCache, LogitsProcessorList
+        from llama_cpp import Llama, LlamaCache, LogitsProcessorList, llama_print_timings
 else:
-    from llama_cpp import Llama, LlamaCache, LogitsProcessorList
+    from llama_cpp import Llama, LlamaCache, LogitsProcessorList, llama_print_timings
 
 
 def ban_eos_logits_processor(eos_token, input_ids, logits):
@@ -107,3 +107,7 @@ class LlamaCppModel:
             for token in generator:
                 reply += token
                 yield reply
+
+
+    def print_timings(self):
+        llama_print_timings(self.model.ctx)

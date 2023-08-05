@@ -13,14 +13,14 @@ from modules.logging_colors import logger
 try:
     from exllama.model import ExLlama, ExLlamaCache, ExLlamaConfig
 except:
-    logger.warning('Exllama module failed to load. Will attempt to load from repositories.')
+    logger.warning('Exllama module failed to load. Will attempt to load from local location.')
     try:
         from modules.relative_imports import RelativeImport
 
-        with RelativeImport("repositories/exllama"):
+        with RelativeImport("../../../projects/exllama"):
             from model import ExLlama, ExLlamaCache, ExLlamaConfig
     except:
-        logger.error("Could not find repositories/exllama/. Make sure that exllama is cloned inside repositories/ and is up to date.")
+        logger.error("Could not find ../../../projects/exllama/. Make sure that exllama is cloned inside the relative directory and is up to date.")
         raise
 
 

@@ -22,6 +22,7 @@ from modules.utils import get_available_models
 def get_model_info():
     return {
         'model_name': shared.model_name,
+        'is_model_loaded': shared.model is not None,
         'lora_names': shared.lora_names,
         # dump
         'shared.settings': shared.settings,
@@ -170,7 +171,13 @@ class Handler(BaseHTTPRequestHandler):
                 'result': result,
             })
 
-            self.wfile.write(response.encode('utf-8'))
+            try:
+                self.wfile.write(response.encode('utf-8'))
+            except Exception as e:
+                print('Error writing response. Error:', e)
+                print('Request body:', body)
+                print('Response:', response)
+
 
         elif self.path == '/api/v1/token-count':
             self.send_response(200)

@@ -46,7 +46,8 @@ sampler_hijack.hijack_samplers()
 
 
 def load_model(model_name, loader=None):
-    logger.info(f"Loading {model_name}...")
+    print(f'{shared.args.loader=}')
+    logger.info(f"Loading {model_name}{' with specified loader: '+loader if loader is not None else ''}...")
     t0 = time.time()
 
     shared.is_seq2seq = False
@@ -89,7 +90,7 @@ def load_model(model_name, loader=None):
     if any((shared.args.xformers, shared.args.sdp_attention)):
         llama_attn_hijack.hijack_llama_attention()
 
-    logger.info(f"Loaded the model in {(time.time()-t0):.2f} seconds.\n")
+    logger.info(f"Loaded the model via loader: {loader} in {(time.time()-t0):.2f} seconds.\n")
     return model, tokenizer
 
 

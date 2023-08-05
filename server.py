@@ -65,6 +65,10 @@ def load_model_wrapper(selected_model, loader, autoload=False):
             shared.model_name = selected_model
             unload_model()
             if selected_model != '':
+                # print line number
+                print(f'load_model_wrapper: {traceback.extract_stack(limit=2)[0][1]}')
+                print(f'{shared.model_name=}')
+                print(f'{loader=}')
                 shared.model, shared.tokenizer = load_model(shared.model_name, loader)
 
             if shared.model is not None:
@@ -1169,6 +1173,9 @@ if __name__ == "__main__":
         update_model_parameters(model_settings, initial=True)  # hijacking the command-line arguments
 
         # Load the model
+        print(f'server.main: {traceback.extract_stack(limit=2)[0][1]}')
+        print(f'{shared.model_name=}')
+
         shared.model, shared.tokenizer = load_model(shared.model_name)
         if shared.args.lora:
             add_lora_to_model(shared.args.lora)
