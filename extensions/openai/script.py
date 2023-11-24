@@ -116,6 +116,11 @@ async def openai_completions(request: Request, request_data: CompletionRequest):
 
 @app.post('/v1/chat/completions', response_model=ChatCompletionResponse, dependencies=check_key)
 async def openai_chat_completions(request: Request, request_data: ChatCompletionRequest):
+
+    print('\n-----New chat completion request-----')
+    print(f'{request_data.preset=}')
+    print()
+
     path = request.url.path
     is_legacy = "/generate" in path
 
