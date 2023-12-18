@@ -74,6 +74,7 @@ def load_model(model_name, loader=None):
 
     metadata = get_model_metadata(model_name)
     if loader is None:
+        logger.info(f'{shared.args.loader=}; {metadata["loader"]=}')
         if shared.args.loader is not None:
             loader = shared.args.loader
         else:
@@ -97,6 +98,7 @@ def load_model(model_name, loader=None):
     if any((shared.args.xformers, shared.args.sdp_attention)):
         llama_attn_hijack.hijack_llama_attention()
 
+    logger.debug(f'metadata instructions_template: {metadata["instruction_template"]}')
     shared.settings.update({k: v for k, v in metadata.items() if k in shared.settings})
     if loader.lower().startswith('exllama'):
         shared.settings['truncation_length'] = shared.args.max_seq_len

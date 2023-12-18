@@ -195,8 +195,11 @@ def chat_completions_common(body: dict, is_legacy: bool = False, stream=False) -
     continue_ = body['continue_']
 
     # Instruction template
+    print(f'requested template: {body["instruction_template"]}')
+    print(f'shared.settings template: {shared.settings["instruction_template"]}')
     instruction_template = body['instruction_template'] or shared.settings['instruction_template']
     instruction_template = "Alpaca" if instruction_template == "None" else instruction_template
+    print(f'using template: {instruction_template}')
     name1_instruct, name2_instruct, _, _, context_instruct, turn_template, system_message = load_character_memoized(instruction_template, '', '', instruct=True)
     name1_instruct = body['name1_instruct'] or name1_instruct
     name2_instruct = body['name2_instruct'] or name2_instruct

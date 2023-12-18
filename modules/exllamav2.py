@@ -112,6 +112,10 @@ class Exllamav2Model:
             if len(to_ban) > 0:
                 settings.disallow_tokens(self.tokenizer, to_ban)
 
+        settings.token_repetition_decay = 128 # I added this to mimic exllama v1, especially when using a 0 repetition range (within exllama a zero range[also called sustain] is encoded as -1)
+        # This will allow the similar behavior by v2 when using a 0 repetition range presets. In the future, I should make preset always be composed of a full set of parameters instead relying on defaults.
+        settings.print_settings()
+
         ids = self.tokenizer.encode(prompt, add_bos=state['add_bos_token'], encode_special_tokens=True)
         ids = ids[:, -get_max_prompt_length(state):]
         initial_len = ids.shape[-1]

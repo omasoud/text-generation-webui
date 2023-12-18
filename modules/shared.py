@@ -255,6 +255,7 @@ def is_chat():
 
 
 args.loader = fix_loader_name(args.loader)
+print(f'Default model loader: {args.loader}')
 
 # Activate the multimodal extension
 if args.multimodal_pipeline is not None:

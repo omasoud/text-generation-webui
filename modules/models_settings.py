@@ -113,7 +113,8 @@ def infer_loader(model_name, model_settings):
         # We will prefer ExLlama for GPTQ models, without having to pass --loader exllama so that we can also load non-GPTQ models with the other loaders. 
         # And we don't want to save exllama as the default loader in the config file of each GPTQ model.
         # loader = 'ExLlama_HF' # ExLlama_HF had some issues with some models, we will stick to ExLlama for now.
-        loader = 'ExLlama'
+        #loader = 'ExLlama'
+        loader = 'ExLlamav2' # to test if we get the same results as ExLlama
     elif (path_to_model / 'quant_config.json').exists() or re.match(r'.*-awq', model_name.lower()):
         loader = 'AutoAWQ'
     elif len(list(path_to_model.glob('*.gguf'))) > 0:
