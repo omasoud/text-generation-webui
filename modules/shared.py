@@ -36,14 +36,14 @@ settings = {
     'prompt-default': 'QA',
     'prompt-notebook': 'QA',
     'preset': 'simple-1',
-    'max_new_tokens': 200,
+    'max_new_tokens': 512,
     'max_new_tokens_min': 1,
     'max_new_tokens_max': 4096,
     'negative_prompt': '',
     'seed': -1,
     'truncation_length': 2048,
     'truncation_length_min': 0,
-    'truncation_length_max': 32768,
+    'truncation_length_max': 200000,
     'max_tokens_second': 0,
     'custom_stopping_strings': '',
     'custom_token_bans': '',
@@ -54,10 +54,13 @@ settings = {
     'stream': True,
     'character': 'Assistant',
     'name1': 'You',
-    'instruction_template': 'Alpaca',
     'custom_system_message': '',
+    'instruction_template_str': "{%- set found_item = false -%}\n{%- for message in messages -%}\n    {%- if message['role'] == 'system' -%}\n        {%- set found_item = true -%}\n    {%- endif -%}\n{%- endfor -%}\n{%- if not found_item -%}\n    {{- '' + 'Below is an instruction that describes a task. Write a response that appropriately completes the request.' + '\\n\\n' -}}\n{%- endif %}\n{%- for message in messages %}\n    {%- if message['role'] == 'system' -%}\n        {{- '' + message['content'] + '\\n\\n' -}}\n    {%- else -%}\n        {%- if message['role'] == 'user' -%}\n            {{-'### Instruction:\\n' + message['content'] + '\\n\\n'-}}\n        {%- else -%}\n            {{-'### Response:\\n' + message['content'] + '\\n\\n' -}}\n        {%- endif -%}\n    {%- endif -%}\n{%- endfor -%}\n{%- if add_generation_prompt -%}\n    {{-'### Response:\\n'-}}\n{%- endif -%}",
+    'chat_template_str': "{%- for message in messages %}\n    {%- if message['role'] == 'system' -%}\n        {{- message['content'] + '\\n\\n' -}}\n    {%- else -%}\n        {%- if message['role'] == 'user' -%}\n            {{- name1 + ': ' + message['content'] + '\\n'-}}\n        {%- else -%}\n            {{- name2 + ': ' + message['content'] + '\\n' -}}\n        {%- endif -%}\n    {%- endif -%}\n{%- endfor -%}",
     'chat-instruct_command': 'Continue the chat dialogue below. Write a single reply for the character "<|character|>".\n\n<|prompt|>',
     'autoload_model': False,
+    'gallery-items_per_page': 50,
+    'gallery-open': False,
     'default_extensions': ['gallery'],
 }
 
@@ -77,7 +80,7 @@ parser.add_argument('--verbose', action='store_true', help='Print the prompts to
 parser.add_argument('--chat-buttons', action='store_true', help='Show buttons on the chat tab instead of a hover menu.')
 
 # Model loader
-parser.add_argument('--loader', type=str, help='Choose the model loader manually, otherwise, it will get autodetected. Valid options: transformers, exllama_hf, exllamav2_hf, exllama, exllamav2, autogptq, gptq-for-llama, llama.cpp, llamacpp_hf, ctransformers, autoawq.')
+parser.add_argument('--loader', type=str, help='Choose the model loader manually, otherwise, it will get autodetected. Valid options: Transformers, llama.cpp, llamacpp_HF, ExLlama_HF, ExLlamav2_HF, AutoGPTQ, AutoAWQ, GPTQ-for-LLaMa, ExLlama, ExLlamav2, ctransformers, QuIP#.')
 
 # Accelerate/transformers
 parser.add_argument('--cpu', action='store_true', help='Use the CPU to generate text. Warning: Training on CPU is extremely slow.')
@@ -122,6 +125,7 @@ parser.add_argument('--max_seq_len', type=int, default=2048, help='Maximum seque
 parser.add_argument('--cfg-cache', action='store_true', help='ExLlama_HF: Create an additional cache for CFG negative prompts. Necessary to use CFG with that loader, but not necessary for CFG with base ExLlama.')
 parser.add_argument('--no_flash_attn', action='store_true', help='Force flash-attention to not be used.')
 parser.add_argument('--cache_8bit', action='store_true', help='Use 8-bit cache to save VRAM.')
+parser.add_argument('--num_experts_per_token', type=int, default=2, help='Number of experts to use for generation. Applies to MoE models like Mixtral.')
 
 # AutoGPTQ
 parser.add_argument('--triton', action='store_true', help='Use triton.')
@@ -130,6 +134,7 @@ parser.add_argument('--no_inject_fused_mlp', action='store_true', help='Triton m
 parser.add_argument('--no_use_cuda_fp16', action='store_true', help='This can make models faster on some systems.')
 parser.add_argument('--desc_act', action='store_true', help='For models that do not have a quantize_config.json, this parameter is used to define whether to set desc_act or not in BaseQuantizeConfig.')
 parser.add_argument('--disable_exllama', action='store_true', help='Disable ExLlama kernel, which can improve inference speed on some systems.')
+parser.add_argument('--disable_exllamav2', action='store_true', help='Disable ExLlamav2 kernel.')
 
 # GPTQ-for-LLaMa
 parser.add_argument('--wbits', type=int, default=0, help='Load a pre-quantized model with specified precision in bits. 2, 3, 4 and 8 are supported.')
@@ -195,7 +200,8 @@ for arg in sys.argv[1:]:
         provided_arguments.append(arg)
 
 # Deprecation warnings
-for k in ['notebook', 'chat', 'no_stream', 'mul_mat_q', 'use_fast']:
+deprecated_args = ['notebook', 'chat', 'no_stream', 'mul_mat_q', 'use_fast']
+for k in deprecated_args:
     if getattr(args, k):
         logger.warning(f'The --{k} flag has been deprecated and will be removed soon. Please remove that flag.')
 
@@ -238,6 +244,8 @@ def fix_loader_name(name):
         return 'ctransformers'
     elif name in ['autoawq', 'awq', 'auto-awq']:
         return 'AutoAWQ'
+    elif name in ['quip#', 'quip-sharp', 'quipsharp', 'quip_sharp']:
+        return 'QuIP#'
 
 
 def add_extension(name, last=False):
