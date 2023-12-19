@@ -1,0 +1,16 @@
+instruction_template: |-
+  {%- for message in messages %}
+      {%- if message['role'] == 'system' -%}
+          {{- message['content'] + '\n' -}}
+      {%- else -%}
+          {%- if message['role'] == 'user' -%}
+              {{-'Instruct: ' + message['content'] + '\n'-}}
+          {%- else -%}
+              {{-'Output: ' + message['content'] + '\n' -}}
+          {%- endif -%}
+      {%- endif -%}
+  {%- endfor -%}
+  {%- if add_generation_prompt -%}
+      {{-'Output: '-}}
+  {%- endif -%}
+
