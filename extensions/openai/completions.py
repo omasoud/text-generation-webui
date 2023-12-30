@@ -196,18 +196,23 @@ def chat_completions_common(body: dict, is_legacy: bool = False, stream=False) -
     continue_ = body['continue_']
 
     # Instruction template
-    print(f'shared.settings template_str: {shared.settings["instruction_template_str"]}')
+    new_line = '\n'
+
+    print(f'shared.settings template_str: {shared.settings["instruction_template_str"].count(new_line)} lines')
+    if not body['instruction_template_str']: print('no body instruction_template_str')
+    if not body['instruction_template']: print('no body instruction_template')
     if body['instruction_template_str']:
         instruction_template_str = body['instruction_template_str']
-        print(f'requested template_str: {body["instruction_template_str"]}')
+        print(f'body (requested) template_str: {body["instruction_template_str"].count(new_line)} lines')
     elif body['instruction_template']:
         instruction_template = body['instruction_template']
-        print(f'requested template: {body["instruction_template"]}')
+        print(f'body (requested) template: {body["instruction_template"]}')
         instruction_template = "Alpaca" if instruction_template == "None" else instruction_template
         instruction_template_str = load_instruction_template_memoized(instruction_template)
     else:
         instruction_template_str = shared.settings['instruction_template_str']
-    print(f'using template: {instruction_template_str}')
+        print('using shared.settings template_str')
+    # print(f'using template: {instruction_template_str}')
 
     chat_template_str = body['chat_template_str'] or shared.settings['chat_template_str']
     chat_instruct_command = body['chat_instruct_command'] or shared.settings['chat-instruct_command']
